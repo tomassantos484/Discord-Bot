@@ -6,6 +6,8 @@ from randomszn import *
 from randomszn import random_stats
 from dotenv import load_dotenv
 import os
+import giphy_client
+from giphy_client.rest import ApiException
 
 # Load environment variables
 load_dotenv()
@@ -13,6 +15,7 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 APP_ID = os.getenv("APP_ID")
 PUBLIC_KEY = os.getenv("PUBLIC_KEY")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+GIPHY_KEY = os.getenv("GIPHY_KEY")
 
 
 client = commands.Bot(command_prefix = '!', intents=discord.Intents.all())
@@ -33,9 +36,22 @@ async def hello(interaction: discord.Interaction):
 async def goodbye(interaction: discord.Interaction):
     await interaction.response.send_message(f"Goodbye, {interaction.user.mention}! I hope to see you again soon!", ephemeral=True)
 
-@client.tree.command(name="troutgif", description="Mike Trout sends a gif of himself!")
-async def troutgif(interaction: discord.Interaction):
-    await interaction.response.send_message("https://giphy.com/gifs/nba-celebrity-wH4gkdhGsMuxHxoXgg", ephemeral=True)
+@client.tree.command(name="randomgif", description="Mike Trout sends a random gif!")
+async def randomgif(interaction: discord.Interaction, q="Mike Trout"):
+    api_instance = giphy_client.DefaultApi()
+
+    try:
+        api_response = api_instance.gifs_search_get(GIPHY_KEY, q, rating="g")
+        random_gif_list = list(api_response.data)
+        gif_selection = random.choice(random_gif_list)
+
+        emb = discord.Embed(title=q, color=0x3498db)
+        emb.set_image(url=f'https://media.giphy.com/media/{gif_selection.id}/giphy.gif')
+
+        await interaction.response.send_message(embed=emb, ephemeral=True)
+
+    except ApiException as e:
+        print("Exception when calling DefaultApi->gifs_random_get: %s\n" % e)
 
 @client.tree.command(name="troutstats", description="Mike Trout sends his Baseball-Reference page!")
 async def troutstats(interaction: discord.Interaction):
@@ -44,6 +60,10 @@ async def troutstats(interaction: discord.Interaction):
 @client.tree.command(name="troutfacts", description="Mike Trout sends some facts about himself!")
 async def troutfacts(interaction: discord.Interaction):
     await interaction.response.send_message("https://www.mlb.com/news/mike-trout-facts", ephemeral=True)
+
+@client.tree.command(name="ping", description="Mike Trout sends his ping!")
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message(f"Pong! {round(client.latency * 1000)}ms", ephemeral=True)
 
 @client.tree.command(name="randomseason", description="Generate a random player and a random season based on the stats of the 2022 MLB season.")
 async def generate_random_season(
