@@ -37,7 +37,7 @@ async def goodbye(interaction: discord.Interaction):
     await interaction.response.send_message(f"Goodbye, {interaction.user.mention}! I hope to see you again soon!", ephemeral=True)
 
 @client.tree.command(name="randomgif", description="Mike Trout sends a random gif!")
-async def randomgif(interaction: discord.Interaction, q="Mike Trout"):
+async def randomgif(interaction: discord.Interaction, q: str="Mike Trout"):
     api_instance = giphy_client.DefaultApi()
 
     try:
