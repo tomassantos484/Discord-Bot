@@ -126,6 +126,7 @@ async def randomstatement(interaction: discord.Interaction):
 
     statement = random.choice(statement_prompts)
     statement = statement.replace("{player}", player)
+    statement = statement.replace("{MLBTeam}", teams_list1)
     statement = statement.replace("{MLBTeam1}", teams_list1)
     statement = statement.replace("{MLBTeam2}", teams_list2)
     statement = statement.replace("{randomYears}", str(randomYears))
