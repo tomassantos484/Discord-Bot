@@ -1,4 +1,3 @@
-import pandas as pd
 from MLBTeams import *
 import random
 
