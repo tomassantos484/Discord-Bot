@@ -12,7 +12,7 @@ statement_prompts = [
     "Watching the {MLBTeam}  makes me reconsider being a baseball fan",
     "MLB would be better off without the {MLBTeam}",
     "{MLBTeam}  v {MLBTeam} is the best rivalry in baseball!",
-    "Absolutely disgraceful performance. In all my years as a fan of the {MLBTeam}, I have never seen a group of players so lazy and pathetic. I'm taking my fanhood to the {MLBTeam} where it looks like they know how to run a baseball team.",
+    "Absolutely disgraceful performance. In all my years as a fan of the {MLBTeam1}, I have never seen a group of players so lazy and pathetic. I'm taking my fanhood to the {MLBTeam2} where it looks like they know how to run a baseball team.",
     "Personally, I think the {MLBTeam} should try to win this baseball game",
     "I love {player}!",
     "I hate {player}.",
@@ -52,4 +52,3 @@ statement_prompts = [
     "I’m gatekeeping {player}",
     "Do people actually spend 3 hours of their day watching the {MLBTeam}?"
 ]
-
