@@ -1,9 +1,8 @@
 #Importing Libraries
 import discord
-from discord import app_commands
 from discord.ext import commands
 from randomszn import *
-from randomszn import random_stats
+from randomstatements import *
 from dotenv import load_dotenv
 import os
 import giphy_client
@@ -16,7 +15,6 @@ APP_ID = os.getenv("APP_ID")
 PUBLIC_KEY = os.getenv("PUBLIC_KEY")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 GIPHY_KEY = os.getenv("GIPHY_KEY")
-
 
 client = commands.Bot(command_prefix = '!', intents=discord.Intents.all())
 
@@ -101,5 +99,9 @@ async def generate_random_season(
 
     # Send the response as an ephemeral message
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@client.tree.command(name="randomstatement", description="Mike Trout sends a random statement!")
+async def randomstatement(interaction: discord.Interaction):
+    await interaction.response.send_message(random_statements(), ephemeral=True)
 
 client.run(DISCORD_TOKEN)
