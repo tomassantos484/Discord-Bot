@@ -28,11 +28,11 @@ async def on_ready():
 
 @client.tree.command(name="hello", description="Mike Trout says hello!")
 async def hello(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Hello, {interaction.user.mention}! I am Mike Trout, the best baseball player in the world!", ephemeral=True)
+    await interaction.response.send_message(f"Hello, {interaction.user.mention}! I am Mike Trout, the best baseball player in the world!", ephemeral=False)
 
 @client.tree.command(name="goodbye", description="Mike Trout says goodbye!")
 async def goodbye(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Goodbye, {interaction.user.mention}! I hope to see you again soon!", ephemeral=True)
+    await interaction.response.send_message(f"Goodbye, {interaction.user.mention}! I hope to see you again soon!", ephemeral=False)
 
 @client.tree.command(name="randomgif", description="Mike Trout sends a random gif!")
 async def randomgif(interaction: discord.Interaction, q: str="Mike Trout"):
@@ -46,22 +46,22 @@ async def randomgif(interaction: discord.Interaction, q: str="Mike Trout"):
         emb = discord.Embed(title=q, color=0x3498db)
         emb.set_image(url=f'https://media.giphy.com/media/{gif_selection.id}/giphy.gif')
 
-        await interaction.response.send_message(embed=emb, ephemeral=True)
+        await interaction.response.send_message(embed=emb, ephemeral=False)
 
     except ApiException as e:
         print("Exception when calling DefaultApi->gifs_random_get: %s\n" % e)
 
 @client.tree.command(name="troutstats", description="Mike Trout sends his Baseball-Reference page!")
 async def troutstats(interaction: discord.Interaction):
-    await interaction.response.send_message("https://www.baseball-reference.com/players/t/troutmi01.shtml", ephemeral=True)
+    await interaction.response.send_message("https://www.baseball-reference.com/players/t/troutmi01.shtml", ephemeral=False)
 
 @client.tree.command(name="troutfacts", description="Mike Trout sends some facts about himself!")
 async def troutfacts(interaction: discord.Interaction):
-    await interaction.response.send_message("https://www.mlb.com/news/mike-trout-facts", ephemeral=True)
+    await interaction.response.send_message("https://www.mlb.com/news/mike-trout-facts", ephemeral=False)
 
 @client.tree.command(name="ping", description="Mike Trout sends his ping!")
 async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Pong! {round(client.latency * 1000)}ms", ephemeral=True)
+    await interaction.response.send_message(f"Pong! {round(client.latency * 1000)}ms", ephemeral=False)
 
 @client.tree.command(name="randomseason", description="Generate a random player and a random season based on the stats of the 2022 MLB season.")
 async def generate_random_season(
@@ -98,7 +98,7 @@ async def generate_random_season(
         embed.add_field(name=stat_name.capitalize(), value=stat_value, inline=True)
 
     # Send the response as an ephemeral message
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @client.tree.command(name="randomstatement", description="Mike Trout sends a random statement!")
 async def randomstatement(interaction: discord.Interaction):
@@ -115,7 +115,8 @@ async def randomstatement(interaction: discord.Interaction):
     teams_list = list(Teams.keys())
 
     player = random.choice(player_names)
-    teams_list = random.choice(teams_list)
+    teams_list1 = random.choice(teams_list)
+    teams_list2 = random.choice(teams_list)
     randomYears = random.randint(0, 999)
     randomStat = random.choice(["home runs", "hits", "runs", "RBIs", "walks", "strikeouts", "stolen bases", "batting average", "on-base percentage", "slugging percentage", "OPS", "ERA", "wins", "losses", "saves", "innings pitched", "strikeouts", "walks", "WHIP", "FIP", "WAR"])
     randomMinorLeague = random.choice(["AAA", "AA", "A+","A", "Rookie"])
@@ -125,7 +126,8 @@ async def randomstatement(interaction: discord.Interaction):
 
     statement = random.choice(statement_prompts)
     statement = statement.replace("{player}", player)
-    statement = statement.replace("{MLBTeam}", teams_list)
+    statement = statement.replace("{MLBTeam1}", teams_list1)
+    statement = statement.replace("{MLBTeam2}", teams_list2)
     statement = statement.replace("{randomYears}", str(randomYears))
     statement = statement.replace("{randomStat}", randomStat)
     statement = statement.replace("{randomMinorLeague}", randomMinorLeague)
@@ -133,6 +135,6 @@ async def randomstatement(interaction: discord.Interaction):
     statement = statement.replace("{randomWins}", str(randomWins))
     statement = statement.replace("{randomHomeRuns}", str(randomHomeRuns))
 
-    await interaction.response.send_message(statement, ephemeral=True)
-    
+    await interaction.response.send_message(statement, ephemeral=False)
+
 client.run(DISCORD_TOKEN)
