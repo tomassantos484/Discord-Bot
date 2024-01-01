@@ -1,5 +1,4 @@
 from MLBTeams import *
-import random
 
 #Random Statements
 statement_prompts = [
@@ -54,39 +53,3 @@ statement_prompts = [
     "Do people actually spend 3 hours of their day watching the {MLBTeam}?"
 ]
 
-def random_statements():
-    # Fetching player names
-    # Open the text file containing player names
-    with open('player_names.txt', 'r') as file:
-    # Read all lines from the file
-        player_names = file.readlines()
-
-    # Remove leading and trailing whitespaces from each player name
-        player_names = [name.strip() for name in player_names]
-
-    #Convert MLBTeams dict to list
-    teams_list = list(Teams.keys())
-
-    player = random.choice(player_names)
-    teams_list = random.choice(teams_list)
-    randomYears = random.randint(0, 999)
-    randomStat = random.choice(["home runs", "hits", "runs", "RBIs", "walks", "strikeouts", "stolen bases", "batting average", "on-base percentage", "slugging percentage", "OPS", "ERA", "wins", "losses", "saves", "innings pitched", "strikeouts", "walks", "WHIP", "FIP", "WAR"])
-    randomMinorLeague = random.choice(["AAA", "AA", "A+","A", "Rookie"])
-    randomDivisionFinish = random.choice(["first", "second", "third", "fourth", "fifth"])
-    randomWins = random.randint(0, 162)
-    randomHomeRuns = random.randint(0, 100)
-
-    statement = random.choice(statement_prompts)
-    statement = statement.replace("{player}", player)
-    statement = statement.replace("{MLBTeam}", teams_list)
-    statement = statement.replace("{randomYears}", str(randomYears))
-    statement = statement.replace("{randomStat}", randomStat)
-    statement = statement.replace("{randomMinorLeague}", randomMinorLeague)
-    statement = statement.replace("{randomDivisionFinish}", randomDivisionFinish)
-    statement = statement.replace("{randomWins}", str(randomWins))
-    statement = statement.replace("{randomHomeRuns}", str(randomHomeRuns))
-
-    print(statement)
-    
-if __name__ == "__main__":
-    random_statements()
