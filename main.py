@@ -21,10 +21,12 @@ client = commands.Bot(command_prefix = '!', intents=discord.Intents.all())
 @client.event
 async def on_ready():
     print("Mike Trout is ready to bat!")
+    await client.change_presence(activity=discord.Game(name="Baseball"))
     try:
         synced = await client.tree.sync()
-    except Exception as e: 
+    except Exception as e:
         print(e)
+
 
 @client.tree.command(name="hello", description="Mike Trout says hello!")
 async def hello(interaction: discord.Interaction):
