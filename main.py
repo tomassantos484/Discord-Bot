@@ -27,7 +27,6 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-
 @client.tree.command(name="hello", description="Mike Trout says hello!")
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f"Hello, {interaction.user.mention}! I am Mike Trout, the best baseball player in the world!", ephemeral=False)
@@ -116,7 +115,8 @@ async def randomstatement(interaction: discord.Interaction):
     #Convert MLBTeams dict to list
     teams_list = list(Teams.keys())
 
-    player = random.choice(player_names)
+    player1 = random.choice(player_names)
+    player2 = random.choice(player_names)
     teams_list1 = random.choice(teams_list)
     teams_list2 = random.choice(teams_list)
     randomYears = random.randint(0, 999)
@@ -127,7 +127,9 @@ async def randomstatement(interaction: discord.Interaction):
     randomHomeRuns = random.randint(0, 100)
 
     statement = random.choice(statement_prompts)
-    statement = statement.replace("{player}", player)
+    statement = statement.replace("{player}", player1)
+    statement = statement.replace("{player1}", player1)
+    statement = statement.replace("{player2}", player2)
     statement = statement.replace("{MLBTeam}", teams_list1)
     statement = statement.replace("{MLBTeam1}", teams_list1)
     statement = statement.replace("{MLBTeam2}", teams_list2)
