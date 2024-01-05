@@ -3,13 +3,13 @@ from MLBTeams import *
 #Random Statements
 statement_prompts = [
     "The things I'd do for {player} to be in a {MLBTeam} uniform....",
-    "Trade proposal: {player} for {player}. What do we think?",
+    "Trade proposal: {player1} for {player2}. What do we think?",
     "Don't talk to me if you don't think {player} is going to lead the league in {randomStat}",
     "{MLBTeam} fans, mental health check???",
     "When I become commissioner, I will remove the {MLBTeam} from existence",
     "Scheduled {player} success",
     "{player} truthers are being rewarded!",
-    "Watching the {MLBTeam}  makes me reconsider being a baseball fan",
+    "Watching the {MLBTeam} makes me reconsider being a baseball fan",
     "MLB would be better off without the {MLBTeam}",
     "{MLBTeam1}  v {MLBTeam2} is the best rivalry in baseball!",
     "Absolutely disgraceful performance. In all my years as a fan of the {MLBTeam1}, I have never seen a group of players so lazy and pathetic. I'm taking my fanhood to the {MLBTeam2} where it looks like they know how to run a baseball team.",
@@ -64,3 +64,4 @@ statement_prompts = [
     "I’m gatekeeping {player}",
     "Do people actually spend 3 hours of their day watching the {MLBTeam}?"
 ]
+
