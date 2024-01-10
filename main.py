@@ -4,11 +4,16 @@ import os
 import giphy_client
 import requests
 import random
+from pybaseball import *
+from pybaseball import cache
 from discord.ext import commands
 from randomszn import *
 from randomstatements import *
 from dotenv import load_dotenv
 from giphy_client.rest import ApiException
+
+#Cache for pybaseball
+cache.enable()
 
 # Load environment variables
 load_dotenv()
@@ -95,6 +100,35 @@ async def randomgiftenor(interaction: discord.Interaction, q: str = "Mike Trout"
 
     except Exception as e:
         print("Error!")
+
+@client.tree.command(name="playerlookup", description="Mike Trout sends info about a player of your choice!")
+async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike", last_name: str = "Trout"):
+    player = playerid_lookup(last_name, first_name)
+    if player.empty:
+        await interaction.response.send_message("Player not found!")
+        return
+
+    mlb_key = player['key_mlbam'].iloc[0]
+    retro_key = player['key_retro'].iloc[0]
+    bbref_key = player['key_bbref'].iloc[0]
+    fangraphs_key = player['key_fangraphs'].iloc[0]
+    first_season = int(player['mlb_played_first'].iloc[0])
+    last_season = int(player['mlb_played_last'].iloc[0])
+
+    mlb_url = f"https://www.mlb.com/player/{first_name.lower()}-{last_name.lower()}-{mlb_key}"
+    retrosheet_url = f"https://www.retrosheet.org/boxesetc/{last_name[0].upper()}/P{retro_key}.htm"
+    bbref_url = f"https://www.baseball-reference.com/players/{last_name[0].lower()}/{bbref_key}.shtml"
+    fangraphs_url = f"https://www.fangraphs.com/players/{first_name}-{last_name}/{fangraphs_key}"
+
+    embed = discord.Embed(title=f"{first_name} {last_name}", description=f"Player ID: {mlb_key}", color=discord.Color.blue())
+    embed.add_field(name="First MLB Season", value=first_season, inline=False)
+    embed.add_field(name="Last MLB Season", value=last_season, inline=False)
+    embed.add_field(name="MLB.com:", value=mlb_url, inline=False)
+    embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
+    embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
+    embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
+
+    await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @client.tree.command(name="randomseason", description="Generate a random player and a random season based on the stats of the 2022 MLB season.")
 async def generate_random_season(
