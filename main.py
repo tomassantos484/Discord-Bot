@@ -42,11 +42,7 @@ async def hello(interaction: discord.Interaction):
 @client.tree.command(name="goodbye", description="Mike Trout says goodbye!")
 async def goodbye(interaction: discord.Interaction):
     await interaction.response.send_message(f"Goodbye, {interaction.user.mention}! I hope to see you again soon!", ephemeral=False)
-
-@client.tree.command(name="troutstats", description="Mike Trout sends his Baseball-Reference page!")
-async def troutstats(interaction: discord.Interaction):
-    await interaction.response.send_message("https://www.baseball-reference.com/players/t/troutmi01.shtml", ephemeral=False)
-
+    
 @client.tree.command(name="ping", description="Mike Trout sends his ping!")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message(f"Pong! {round(client.latency * 1000)}ms", ephemeral=False)
