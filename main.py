@@ -4,6 +4,7 @@ import os
 import giphy_client
 import requests
 import random
+import asyncio
 from pybaseball import *
 from pybaseball import cache
 from discord.ext import commands
@@ -104,12 +105,40 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
         await interaction.response.send_message("Player not found!")
         return
 
-    mlb_key = player['key_mlbam'].iloc[0]
-    retro_key = player['key_retro'].iloc[0]
-    bbref_key = player['key_bbref'].iloc[0]
-    fangraphs_key = player['key_fangraphs'].iloc[0]
-    first_season = int(player['mlb_played_first'].iloc[0])
-    last_season = int(player['mlb_played_last'].iloc[0])
+    if len(player) > 1:
+        # If there are multiple players with the same name, pick up the player names and the years they have played in MLB
+        player_info = [f"{index + 1}. {player['name_first'].capitalize()} {player['name_last'].capitalize()} ({int(player['mlb_played_first'])}-{int(player['mlb_played_last'])})" for index, player in player.iterrows()]
+        players_list = "\n".join(player_info)
+        
+        players_list = "\n".join(player_info)
+        
+        await interaction.response.send_message(f"Multiple players found with the same name. Please choose a player by entering the corresponding number:\n{players_list}")
+
+        try:
+            # Wait for the user to choose a player by entering a number
+            user_choice_message = await client.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel, timeout=30)
+            chosen_index = int(user_choice_message.content) - 1
+
+            if 0 <= chosen_index < len(player):
+                selected_player = player.iloc[chosen_index]
+            else:
+                await interaction.response.send_message("Invalid choice. Please enter a valid number.")
+                return
+
+        except asyncio.TimeoutError:
+            await interaction.response.send_message("You took too long to respond. The request has been canceled.")
+            return
+
+    else:
+        # If there is only one player with the given name
+        selected_player = player.iloc[0]
+
+    mlb_key = selected_player['key_mlbam']
+    retro_key = selected_player['key_retro']
+    bbref_key = selected_player['key_bbref']
+    fangraphs_key = selected_player['key_fangraphs']
+    first_season = int(selected_player['mlb_played_first'])
+    last_season = int(selected_player['mlb_played_last'])
 
     mlb_url = f"https://www.mlb.com/player/{first_name.lower()}-{last_name.lower()}-{mlb_key}"
     retrosheet_url = f"https://www.retrosheet.org/boxesetc/{last_name[0].upper()}/P{retro_key}.htm"
