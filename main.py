@@ -116,17 +116,17 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
 
         try:
             # Wait for the user to choose a player by entering a number
-            user_choice_message = await client.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel, timeout=30)
-            chosen_index = int(user_choice_message.content) - 1
+            user_choice_interaction = await interaction.followup.send(embed=embed, ephemeral=False)
+            chosen_index = int(user_choice_interaction.content) - 1
 
             if 0 <= chosen_index < len(player):
                 selected_player = player.iloc[chosen_index]
             else:
-                await interaction.response.send_message("Invalid choice. Please enter a valid number.")
+                await interaction.followup.send("Invalid choice. Please enter a valid number.", ephemeral=True)
                 return
 
         except asyncio.TimeoutError:
-            await interaction.response.send_message("You took too long to respond. The request has been canceled.")
+            await interaction.followup.send("You took too long to respond. The request has been canceled.", ephemeral=True)
             return
 
     else:
@@ -152,7 +152,7 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
     embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
     embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
     embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
-    
+
     # Check if the interaction has already been responded to
     if not interaction.response.is_done():
         await interaction.response.send_message(embed=embed, ephemeral=False)
