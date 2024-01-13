@@ -152,8 +152,10 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
     embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
     embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
     embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
-
-    await interaction.response.send_message(embed=embed, ephemeral=False)
+    
+    # Check if the interaction has already been responded to
+    if not interaction.response.is_done():
+        await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @client.tree.command(name="randomseason", description="Generate a random player and a random season based on the stats of the 2022 MLB season.")
 async def generate_random_season(
