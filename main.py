@@ -123,6 +123,27 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
 
             if 0 <= chosen_index < len(player):
                 selected_player = player.iloc[chosen_index]
+
+                 mlb_key = selected_player['key_mlbam']
+                 retro_key = selected_player['key_retro']
+                 bbref_key = selected_player['key_bbref']
+                 fangraphs_key = selected_player['key_fangraphs']
+                 first_season = int(selected_player['mlb_played_first'])
+                 last_season = int(selected_player['mlb_played_last'])
+
+                 mlb_url = f"https://www.mlb.com/player/{first_name.lower()}-{last_name.lower()}-{mlb_key}"
+                 retrosheet_url = f"https://www.retrosheet.org/boxesetc/{last_name[0].upper()}/P{retro_key}.htm"
+                 bbref_url = f"https://www.baseball-reference.com/players/{last_name[0].lower()}/{bbref_key}.shtml"
+                 fangraphs_url = f"https://www.fangraphs.com/players/{first_name}-{last_name}/{fangraphs_key}"
+
+                 embed = discord.Embed(title=f"{first_name} {last_name}", description=f"Player ID: {mlb_key}", color=discord.Color.blue())
+                 embed.add_field(name="First MLB Season", value=first_season, inline=False)
+                 embed.add_field(name="Last MLB Season", value=last_season, inline=False)
+                 embed.add_field(name="MLB.com:", value=mlb_url, inline=False)
+                 embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
+                 embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
+                 embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
+                
             else:
                 await interaction.followup.send("Invalid choice. Please enter a valid number.", ephemeral=True)
                 return
