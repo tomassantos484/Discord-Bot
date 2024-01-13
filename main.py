@@ -105,6 +105,8 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
         await interaction.response.send_message("Player not found!")
         return
 
+    embed = None
+    
     if len(player) > 1:
         # If there are multiple players with the same name, pick up the player names and the years they have played in MLB
         player_info = [f"{index + 1}. {player['name_first'].capitalize()} {player['name_last'].capitalize()} ({int(player['mlb_played_first'])}-{int(player['mlb_played_last'])})" for index, player in player.iterrows()]
