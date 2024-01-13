@@ -106,79 +106,27 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
         await interaction.response.send_message("Player not found!")
         return
 
-    embed = None
-    
-    if len(player) > 1:
-        # If there are multiple players with the same name, pick up the player names and the years they have played in MLB
-        player_info = [f"{index + 1}. {player['name_first'].capitalize()} {player['name_last'].capitalize()} ({int(player['mlb_played_first'])}-{int(player['mlb_played_last'])})" for index, player in player.iterrows()]
-        players_list = "\n".join(player_info)
+    mlb_key = player['key_mlbam'].iloc[0]
+    retro_key = player['key_retro'].iloc[0]
+    bbref_key = player['key_bbref'].iloc[0]
+    fangraphs_key = player['key_fangraphs'].iloc[0]
+    first_season = int(player['mlb_played_first'].iloc[0])
+    last_season = int(player['mlb_played_last'].iloc[0])
 
-        await interaction.response.send_message(f"Multiple players found with the same name. Please choose a player by entering the corresponding number:\n{players_list}")
+    mlb_url = f"https://www.mlb.com/player/{first_name.lower()}-{last_name.lower()}-{mlb_key}"
+    retrosheet_url = f"https://www.retrosheet.org/boxesetc/{last_name[0].upper()}/P{retro_key}.htm"
+    bbref_url = f"https://www.baseball-reference.com/players/{last_name[0].lower()}/{bbref_key}.shtml"
+    fangraphs_url = f"https://www.fangraphs.com/players/{first_name}-{last_name}/{fangraphs_key}"
 
-        try:
-            # Wait for the user to choose a player by entering a number
-            user_choice_interaction = await client.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel, timeout=30)
-            chosen_index = int(user_choice_interaction.content) - 1
+    embed = discord.Embed(title=f"{first_name} {last_name}", description=f"Player ID: {mlb_key}", color=discord.Color.blue())
+    embed.add_field(name="First MLB Season", value=first_season, inline=False)
+    embed.add_field(name="Last MLB Season", value=last_season, inline=False)
+    embed.add_field(name="MLB.com:", value=mlb_url, inline=False)
+    embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
+    embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
+    embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
 
-            if 0 <= chosen_index < len(player):
-                selected_player = player.iloc[chosen_index]
-
-                mlb_key = selected_player['key_mlbam']
-                retro_key = selected_player['key_retro']
-                bbref_key = selected_player['key_bbref']
-                fangraphs_key = selected_player['key_fangraphs']
-                first_season = int(selected_player['mlb_played_first'])
-                last_season = int(selected_player['mlb_played_last'])
-
-                mlb_url = f"https://www.mlb.com/player/{first_name.lower()}-{last_name.lower()}-{mlb_key}"
-                retrosheet_url = f"https://www.retrosheet.org/boxesetc/{last_name[0].upper()}/P{retro_key}.htm"
-                bbref_url = f"https://www.baseball-reference.com/players/{last_name[0].lower()}/{bbref_key}.shtml"
-                fangraphs_url = f"https://www.fangraphs.com/players/{first_name}-{last_name}/{fangraphs_key}"
-
-                embed = discord.Embed(title=f"{first_name} {last_name}", description=f"Player ID: {mlb_key}", color=discord.Color.blue())
-                embed.add_field(name="First MLB Season", value=first_season, inline=False)
-                embed.add_field(name="Last MLB Season", value=last_season, inline=False)
-                embed.add_field(name="MLB.com:", value=mlb_url, inline=False)
-                embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
-                embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
-                embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
-                
-            else:
-                await interaction.response.send_message("Invalid choice. Please enter a valid number.")
-                return
-
-        except asyncio.TimeoutError:
-            await interaction.response.send_message("You took too long to respond. The request has been canceled.")
-            return
-
-    else:
-        # If there is only one player with the given name
-        selected_player = player.iloc[0]
-
-        mlb_key = selected_player['key_mlbam']
-        retro_key = selected_player['key_retro']
-        bbref_key = selected_player['key_bbref']
-        fangraphs_key = selected_player['key_fangraphs']
-        first_season = int(selected_player['mlb_played_first'])
-        last_season = int(selected_player['mlb_played_last'])
-
-        mlb_url = f"https://www.mlb.com/player/{first_name.lower()}-{last_name.lower()}-{mlb_key}"
-        retrosheet_url = f"https://www.retrosheet.org/boxesetc/{last_name[0].upper()}/P{retro_key}.htm"
-        bbref_url = f"https://www.baseball-reference.com/players/{last_name[0].lower()}/{bbref_key}.shtml"
-        fangraphs_url = f"https://www.fangraphs.com/players/{first_name}-{last_name}/{fangraphs_key}"
-
-        embed = discord.Embed(title=f"{first_name} {last_name}", description=f"Player ID: {mlb_key}", color=discord.Color.blue())
-        embed.add_field(name="First MLB Season", value=first_season, inline=False)
-        embed.add_field(name="Last MLB Season", value=last_season, inline=False)
-        embed.add_field(name="MLB.com:", value=mlb_url, inline=False)
-        embed.add_field(name="Retrosheet:", value=retrosheet_url, inline=False)
-        embed.add_field(name="Baseball Reference:", value=bbref_url, inline=False)
-        embed.add_field(name="Fangraphs:", value=fangraphs_url, inline=False)
-
-    # Check if the interaction has already been responded to
-    if not interaction.response.is_done() and embed:
-        await interaction.response.send_message(embed=embed, ephemeral=False)
-
+    await interaction.response.send_message(embed=embed, ephemeral=False)
 
 
 @client.tree.command(name="randomseason", description="Generate a random player and a random season based on the stats of the 2022 MLB season.")
