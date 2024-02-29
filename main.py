@@ -4,7 +4,7 @@ import os
 import giphy_client
 import requests
 import random
-import asyncio
+import json
 from pybaseball import *
 from pybaseball import cache
 from discord.ext import commands
@@ -24,6 +24,7 @@ PUBLIC_KEY = os.getenv("PUBLIC_KEY")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 GIPHY_KEY = os.getenv("GIPHY_KEY")
 TENOR_KEY = os.getenv("TENOR_KEY")
+OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
 
 client = commands.Bot(command_prefix = '!', intents=discord.Intents.all())
 
@@ -98,7 +99,6 @@ async def randomgiftenor(interaction: discord.Interaction, q: str = "Mike Trout"
     except Exception as e:
         print("Error!")
 
-
 @client.tree.command(name="playerlookup", description="Mike Trout sends info about a player of your choice!")
 async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike", last_name: str = "Trout"):
     player = playerid_lookup(last_name, first_name)
@@ -128,7 +128,6 @@ async def playerlookup(interaction: discord.Interaction, first_name: str = "Mike
 
     await interaction.response.send_message(embed=embed, ephemeral=False)
 
-
 @client.tree.command(name="randomseason", description="Generate a random player and a random season based on the stats of the 2022 MLB season.")
 async def generate_random_season(
     interaction: discord.Interaction,
@@ -139,9 +138,22 @@ async def generate_random_season(
     position: str
 ):
     
+    #Fetch player names from text file:
+    first_names = []
+    last_names = []
+    
+    with open('player_names.txt', 'r') as file:
+        for line in file:
+            parts = line.split().split()
+            lastname = parts[-1]
+            firstname = ''.join(parts[:-1])
+            first_names.append(firstname)
+            last_names.append(lastname)
+
+    
     player_info = {
-        "firstname": first_name if first_name.lower() != 'random' else random.choice(MLB_FirstNames),
-        "lastname": last_name if last_name.lower() != 'random' else random.choice(MLB_LastNames),
+        "firstname": first_name if first_name.lower() != 'random' else random.choice(first_names),
+        "lastname": last_name if last_name.lower() != 'random' else random.choice(last_names),
         "age": age if age != -1 else random.randint(18, 49),
         "team": team if team.lower() != 'random' else random.choice(list(Teams.values())),
         "position": position if position.lower() != 'random' else random.choice(list(Positions.values())),
@@ -205,6 +217,30 @@ async def randomstatement(interaction: discord.Interaction):
     statement = statement.replace("{randomWins}", str(randomWins))
     statement = statement.replace("{randomHomeRuns}", str(randomHomeRuns))
 
+    await interaction.response.send_message(statement, ephemeral=False)
+
+@client.tree.command(name="troutify", description="Mike Trout sends a random statement about himself!")
+async def troutify(interaction: discord.Interaction):
+    def getResponse(model, query):
+        response = requests.post (
+            url = "https://openrouter.ai/api/v1/chat/completions",
+            headers = {
+                "Authorization": f"Bearer {OPENROUTER_KEY}",
+            },
+
+        data = json.dumps({
+            "model": model,
+            "messages":[
+                {"role":"user","content":query},
+            ]
+     })
+    )
+
+# Call the function and store the response
+    response = getResponse("gryphe/mythomist-7b:free", "Generate a random funny/semi-satirical baseball-related statement about Mike Trout.")
+
+# Access and print the statement
+    statement = response['choices'][0]['message']['content']
     await interaction.response.send_message(statement, ephemeral=False)
 
 client.run(DISCORD_TOKEN)
