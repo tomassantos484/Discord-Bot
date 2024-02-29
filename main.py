@@ -248,10 +248,10 @@ async def troutify(interaction: discord.Interaction):
     if response and 'choices' in response and len(response['choices']) > 0:
         # Access and send the statement
         statement = response['choices'][0]['message']['content']
-        await interaction.response.send_message(statement, ephemeral=False)
+        await interaction.followup.send(statement, ephemeral=False)
     else:
         # Handle error or empty response
         error_message = "Sorry, I couldn't fetch a statement for Mike Trout at the moment."
-        await interaction.response.send_message(error_message, ephemeral=False)
+        await interaction.followup.send(error_message, ephemeral=False)
 
 client.run(DISCORD_TOKEN)
