@@ -221,6 +221,10 @@ async def randomstatement(interaction: discord.Interaction):
 
 @client.tree.command(name="troutify", description="Mike Trout sends a random statement about himself!")
 async def troutify(interaction: discord.Interaction):
+    # Immediately defer the interaction to indicate processing is happening
+    # and to get more time for sending the response.
+    await interaction.response.defer(ephemeral=False)
+    
     def getResponse(model, query):
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
