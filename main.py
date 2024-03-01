@@ -256,13 +256,11 @@ async def troutify(interaction: discord.Interaction):
         error_message = "Sorry, I couldn't fetch a statement for Mike Trout at the moment."
         await interaction.followup.send(error_message, ephemeral=False)
 
-
-@client.tree.command(name="yogism", description="Mike Trout produces a yogism based on uploaded image!")
-async def yogism(interaction: discord.Interaction):
-
+client.command(name="yogism", description="Mike Trout produces a yogism based on uploaded image!")
+async def yogism(ctx, image_url: str):
     def getResponse(model, query, image_url):
         response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
+           url="https://openrouter.ai/api/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {OPENROUTER_KEY}",
             },
@@ -278,26 +276,23 @@ async def yogism(interaction: discord.Interaction):
             print(f"API call failed with status code {response.status_code}")
             return None
 
-    #upload image
-    await interaction.response.send_message("Please upload the image you want to use for the yogism.", ephemeral=True)
-
     def check(message):
-        return message.author == interaction.user and message.attachments
+        return message.author == ctx.author and message.attachments
     
     message = await client.wait_for('message', check=check)
 
     if message.attachments:
         image_url = message.attachments[0].url
-        response = getResponse("gryphe/mythomist-7b:free", "Generate a random funny/semi-satiricall yogism from baseball player Yogi Berra based on the uploaded image.", image_url)
+        response = getResponse("gryphe/mythomist-7b:free", "Generate a random funny/semi-satirical yogism from baseball player Yogi Berra based on the uploaded image.", image_url)
 
     if response and 'choices' in response and len(response['choices']) > 0:
         # Access and send the statement
         statement = response['choices'][0]['message']['content']
-        await interaction.followup.send(statement, ephemeral=False)
+        await ctx.send(statement)
 
     else:
         # Handle error or empty response
         error_message = "Sorry, I couldn't fetch a yogism at the moment."
-        await interaction.followup.send(error_message, ephemeral=False)
+        await ctx.send(error_message)
 
 client.run(DISCORD_TOKEN)
