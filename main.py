@@ -245,14 +245,14 @@ async def randomstatement(interaction: discord.Interaction, player: str = "Mike 
         team = "Los Angeles Angels"
         response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statements based on {player} and {team}.")
 
-    if response and 'choices' in response and len(response['choices']) > 0:
+   if response and 'choices' in response and len(response['choices']) > 0:
         # Access and send the statement
         statement = response['choices'][0]['message']['content']
-        await interaction.followup.send(statement, ephemeral=False)
+        await interaction.response.send_message(statement, ephemeral=False)
     else:
         # Handle error or empty response
         error_message = "Sorry, I couldn't fetch a random statement. Please try again later!"
-        await interaction.followup.send(error_message, ephemeral=False)
+        await interaction.response.send_message(error_message, ephemeral=False)
 
 @client.tree.command(name="troutify", description="Mike Trout sends a random statement about himself!")
 async def troutify(interaction: discord.Interaction):
