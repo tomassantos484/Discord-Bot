@@ -185,39 +185,74 @@ async def randomstatement(interaction: discord.Interaction, player: str = "Mike 
     with open('player_names.txt', 'r') as file:
     # Read all lines from the file
         player_names = file.readlines()
-
     # Remove leading and trailing whitespaces from each player name
         player_names = [name.strip() for name in player_names]
 
-    #Convert MLBTeams dict to list
-    teams_list = list(Teams.keys())
+    def getResponse(model, query):
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_KEY}",
+            },
+            data=json.dumps({
+                "model": model,
+                "messages": [{"role": "user", "content": query}],
+            })
+        )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"API call failed with status code {response.status_code}")
+            return None
+        
+    #Use Cases
+    #case 1: player and team are not random 
+    if player != "random" and team != "random":
+        response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on {player} and {team}.")
 
-    player1 = random.choice(player_names)
-    player2 = random.choice(player_names)
-    teams_list1 = random.choice(teams_list)
-    teams_list2 = random.choice(teams_list)
-    randomYears = random.randint(0, 999)
-    randomStat = random.choice(["home runs", "hits", "runs", "RBIs", "walks", "strikeouts", "stolen bases", "batting average", "on-base percentage", "slugging percentage", "OPS", "ERA", "wins", "losses", "saves", "innings pitched", "strikeouts", "walks", "WHIP", "FIP", "WAR"])
-    randomMinorLeague = random.choice(["AAA", "AA", "A+","A", "Rookie"])
-    randomDivisionFinish = random.choice(["first", "second", "third", "fourth", "fifth"])
-    randomWins = random.randint(0, 162)
-    randomHomeRuns = random.randint(0, 100)
+    #case 2: player is random and team is not random
+    elif player == "random" and team != "random":
+        response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on a random MLB player and {team}.")
+    
+    #case 3: player is not random and team is random
+    elif player != "random" and team == "random":
+        team = random.choice(list(Teams.values()))
+        response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on {player} and a random MLB Team.")
 
-    statement = random.choice(statement_prompts)
-    statement = statement.replace("{player}", player1)
-    statement = statement.replace("{player1}", player1)
-    statement = statement.replace("{player2}", player2)
-    statement = statement.replace("{MLBTeam}", teams_list1)
-    statement = statement.replace("{MLBTeam1}", teams_list1)
-    statement = statement.replace("{MLBTeam2}", teams_list2)
-    statement = statement.replace("{randomYears}", str(randomYears))
-    statement = statement.replace("{randomStat}", randomStat)
-    statement = statement.replace("{randomMinorLeague}", randomMinorLeague)
-    statement = statement.replace("{randomDivisionFinish}", randomDivisionFinish)
-    statement = statement.replace("{randomWins}", str(randomWins))
-    statement = statement.replace("{randomHomeRuns}", str(randomHomeRuns))
+    #case 4: player and team are random
+    elif player == "random" and team == "random":
+        response = getResponse("gryphe/mythomist-7b:free", "Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on a random MLB Player and a random MLB Team.")
+    
+    #case 5: player is not random and team is empty (random statement about player)
+    elif player != "random" and team == "empty":
+        response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on {player}.")
 
-    await interaction.response.send_message(statement, ephemeral=False)
+    #case 6: player is empty and team is not random (random statement about team)
+    elif player == "empty" and team != "random":
+        response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on {team}.")
+    
+    #case 7: player is random and team is empty (random statement about random player)
+    elif player == "random" and team == "empty":
+        response = getResponse("gryphe/mythomist-7b:free", "Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on a random MLB Player.")
+    
+    #case 8: player is empty and team is random (random statement about random team)
+    elif player == "empty" and team == "random":
+        response = getResponse("gryphe/mythomist-7b:free", "Generate a random funny, semi-satirical, and meme-like baseball-related random statement based on a random MLB Team.")
+
+    #case 9: default to Mike Trout and LAA if both player and team are empty
+    else:
+        player = "Mike Trout"
+        team = "Los Angeles Angels"
+        response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statements based on {player} and {team}.")
+
+    if response and 'choices' in response and len(response['choices']) > 0:
+        # Access and send the statement
+        statement = response['choices'][0]['message']['content']
+        await interaction.followup.send(statement, ephemeral=False)
+    else:
+        # Handle error or empty response
+        error_message = "Sorry, I couldn't fetch a random statement. Please try again later!"
+        await interaction.followup.send(error_message, ephemeral=False)
 
 @client.tree.command(name="troutify", description="Mike Trout sends a random statement about himself!")
 async def troutify(interaction: discord.Interaction):
