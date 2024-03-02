@@ -245,7 +245,7 @@ async def randomstatement(interaction: discord.Interaction, player: str = "Mike 
         team = "Los Angeles Angels"
         response = getResponse("gryphe/mythomist-7b:free", f"Generate a random funny, semi-satirical, and meme-like baseball-related random statements based on {player} and {team}.")
 
-   if response and 'choices' in response and len(response['choices']) > 0:
+    if response and 'choices' in response and len(response['choices']) > 0:
         # Access and send the statement
         statement = response['choices'][0]['message']['content']
         await interaction.response.send_message(statement, ephemeral=False)
