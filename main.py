@@ -180,6 +180,10 @@ async def generate_random_season(
 
 @client.tree.command(name="randomstatement", description="Mike Trout sends a random statement!")
 async def randomstatement(interaction: discord.Interaction, player: str = "Mike Trout", team: str = "Los Angeles Angels"):
+    # Immediately defer the interaction to indicate processing is happening
+    # and to get more time for sending the response.
+    await interaction.response.defer(ephemeral=False)
+
     # Fetching player names
     # Open the text file containing player names
     with open('player_names.txt', 'r') as file:
@@ -187,6 +191,7 @@ async def randomstatement(interaction: discord.Interaction, player: str = "Mike 
         player_names = file.readlines()
     # Remove leading and trailing whitespaces from each player name
         player_names = [name.strip() for name in player_names]
+
 
     def getResponse(model, query):
         response = requests.post(
@@ -248,11 +253,11 @@ async def randomstatement(interaction: discord.Interaction, player: str = "Mike 
     if response and 'choices' in response and len(response['choices']) > 0:
         # Access and send the statement
         statement = response['choices'][0]['message']['content']
-        await interaction.response.send_message(statement, ephemeral=False)
+        await interaction.followup.send(statement, ephemeral=False)
     else:
         # Handle error or empty response
         error_message = "Sorry, I couldn't fetch a random statement. Please try again later!"
-        await interaction.response.send_message(error_message, ephemeral=False)
+        await interaction.followup.send(error_message, ephemeral=False)
 
 @client.tree.command(name="troutify", description="Mike Trout sends a random statement about himself!")
 async def troutify(interaction: discord.Interaction):
